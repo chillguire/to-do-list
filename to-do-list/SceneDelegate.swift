@@ -7,7 +7,6 @@
 //
 
 import UIKit
-import RealmSwift
 
 class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 
@@ -19,14 +18,9 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		// This delegate does not imply the connecting scene or session are new (see `application:configurationForConnectingSceneSession` instead).
 		guard let _ = (scene as? UIWindowScene) else { return }
 		
-		// where is the realm db
-		//print(Realm.Configuration.defaultConfiguration.fileURL)
+//		print(NSSearchPathForDirectoriesInDomains(.documentDirectory, .userDomainMask, true).last! as String)
 		
-		do {
-			_ = try Realm()
-		} catch {
-			print("error with realm \(error)")
-		}
+		print("willConnectTo")
 	}
 	
 	func sceneDidDisconnect(_ scene: UIScene) {
@@ -34,8 +28,6 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		// This occurs shortly after the scene enters the background, or when its session is discarded.
 		// Release any resources associated with this scene that can be re-created the next time the scene connects.
 		// The scene may re-connect later, as its session was not neccessarily discarded (see `application:didDiscardSceneSessions` instead).
-		
-		print("sceneDidDisconnect")
 	}
 
 	func sceneDidBecomeActive(_ scene: UIScene) {
@@ -58,7 +50,11 @@ class SceneDelegate: UIResponder, UIWindowSceneDelegate {
 		// Use this method to save data, release shared resources, and store enough scene-specific state information
 		// to restore the scene back to its current state.
 		
+		(UIApplication.shared.delegate as? AppDelegate)?.saveContext()
+		
 		print("sceneDidEnterBackground")
 	}
+
+	
 }
 

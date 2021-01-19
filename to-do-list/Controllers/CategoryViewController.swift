@@ -7,85 +7,65 @@
 //
 
 import UIKit
-import RealmSwift
-import ChameleonFramework
+import CoreData
 
-class CategoryViewController: SwipeTableViewController {
+class CategoryViewController: UITableViewController {
 
-	let realm = try! Realm()
+	var categoryArray = [Category]()
 	
-	var categoryArray : Results<Category>?
+	// shared.delegate is the singleton instance of UIApplication
+	let context = (UIApplication.shared.delegate as! AppDelegate).persistentContainer.viewContext
 	
-	// MARK: - view gets loaded
-	
-    override func viewDidLoad() {
-        super.viewDidLoad()
-	
+	override func viewDidLoad() {
+		super.viewDidLoad()
+
 		loadCategory()
     }
 
-	// MARK: - basic methods for UITableViewController
+	// MARK: - TableView Datasource methods
 	
 	override func tableView(_ tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-		
-		return categoryArray?.count ?? 1
+		return categoryArray.count
 	}
 	
 	override func tableView(_ tableView: UITableView, cellForRowAt indexPath: IndexPath) -> UITableViewCell {
+				
+		let cell = tableView.dequeueReusableCell(withIdentifier: "categoryCell", for: indexPath)
 		
-		let cell = super.tableView(tableView, cellForRowAt: indexPath)
-						
-		cell.textLabel?.text = categoryArray?[indexPath.row].name ?? "No categories added yet"
+		cell.textLabel?.text = categoryArray[indexPath.row].name
 		
-		cell.backgroundColor = UIColor(hexString: categoryArray?[indexPath.row].backgroundColour ?? "AF52DE")
-		
-		cell.textLabel?.textColor = ContrastColorOf(UIColor(hexString: categoryArray?[indexPath.row].backgroundColour ?? "AF52DE")!, returnFlat: true)
-		
-		tableView.separatorStyle = .none
-
 		return cell
 	}
 	
-	// MARK: - data manipulation CRUD methods
-
-	// Save category
-	func save(category: Category) {
+	// MARK: - Data manipulation methods
+	
+	// save category
+	func saveCategory() {
+		
 		do {
-			try realm.write{
-				realm.add(category)
-			}
+			try context.save()
 		} catch {
 			print("Error saving context. \(error)")
 		}
 		
+		// reload view
 		self.tableView.reloadData()
 	}
 	
-	// Load category
-	func loadCategory() {
+	// load category
+	func loadCategory(with request: NSFetchRequest<Category> = Category.fetchRequest()) {
 		
-		categoryArray = realm.objects(Category.self)
-
+		do {
+			categoryArray = try context.fetch(request)
+		} catch {
+			print("Error fetching context. \(error)")
+		}
+		
+		// reload view
 		self.tableView.reloadData()
 	}
 	
-	// Delete category
-	override func updateModel(at indexPath: IndexPath) {
-		if let categoryForDeletion = self.categoryArray?[indexPath.row] {
-			do {
-				try self.realm.write {
-					self.realm.delete(categoryForDeletion)
-				}
-			} catch {
-				print(error)
-			}
-
-		} else {
-			print("Add success message")
-		}
-	}
-	
-	// MARK: - + button gets pressed
+	// MARK: - addButton gets pressed
 	
 	@IBAction func addButtonPressed(_ sender: UIBarButtonItem) {
 		
@@ -95,12 +75,13 @@ class CategoryViewController: SwipeTableViewController {
 				
 		let action = UIAlertAction(title: "Add category", style: .default) { (action) in
 			
-			let newCategory = Category()
+			// add new category
+			let newCategory = Category(context: self.context)
 									
 			newCategory.name = textField.text!
-			newCategory.backgroundColour = UIColor.randomFlat().hexValue()
-						
-			self.save(category: newCategory)
+			
+			self.categoryArray.append(newCategory)
+			self.saveCategory()
 		}
 				
 		alert.addTextField { (alertTextField) in
@@ -114,21 +95,19 @@ class CategoryViewController: SwipeTableViewController {
 		present(alert, animated: true, completion: nil)
 	}
 	
-	// MARK: - events
+	// MARK: - TableView Delegate methods
 	
-	// X row gets selected
 	override func tableView(_ tableView: UITableView, didSelectRowAt indexPath: IndexPath) {
 		
 		performSegue(withIdentifier: "goToItems", sender: self)
 	}
 	
-	// OJO
+	// SEGUE
 	override func prepare(for segue: UIStoryboardSegue, sender: Any?) {
 		let destinationVC = segue.destination as! TodoListViewController
 		
 		if let indexPath = tableView.indexPathForSelectedRow {
-			destinationVC.selectedCategory = categoryArray?[indexPath.row]
+			destinationVC.selectedCategory = categoryArray[indexPath.row]
 		}
 	}
 }
-
