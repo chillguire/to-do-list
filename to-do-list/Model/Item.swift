@@ -8,8 +8,7 @@
 
 import Foundation
 
-// inheriting from codable replaces the need to use encodable or decodable
-class Item: Codable {
+class Item {
 	var title : String = ""
 	var done : Bool = false
 }

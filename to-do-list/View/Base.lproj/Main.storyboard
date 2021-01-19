@@ -9,7 +9,7 @@
         <!--to-do-list-->
         <scene sceneID="faH-gh-REX">
             <objects>
-                <tableViewController id="oLJ-oC-MbW" userLabel="to-do-list" customClass="TodoListViewController" customModule="to_do_list" customModuleProvider="target" sceneMemberID="viewController">
+                <tableViewController id="oLJ-oC-MbW" customClass="TodoListViewController" customModule="to_do_list" customModuleProvider="target" sceneMemberID="viewController">
                     <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" rowHeight="-1" estimatedRowHeight="-1" sectionHeaderHeight="28" sectionFooterHeight="28" id="C5b-jo-svk">
                         <rect key="frame" x="0.0" y="0.0" width="414" height="896"/>
                         <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
